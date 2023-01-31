@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+                        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.co.kr.mapper.UserMapper">
+
+<select id="list" resultType="com.co.kr.vo.LoginDTO">
+        SELECT mb_id,mb_pw,mb_use FROM jsp.member
+    </select>
+</mapper>
