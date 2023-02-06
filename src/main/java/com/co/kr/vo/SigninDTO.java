@@ -9,8 +9,10 @@ import lombok.ToString;
 @Getter
 @Setter
 @AllArgsConstructor
-public class LoginDTO {
+public class SigninDTO {
 	private String id;
 	private String pw;
-	private String admin;
+//	private String mb_use;
+//	private String mb_create_at;
+//	private String mb_update_at;
 }

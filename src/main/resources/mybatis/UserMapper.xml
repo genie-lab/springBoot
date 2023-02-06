@@ -3,7 +3,57 @@
                         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.co.kr.mapper.UserMapper">
 
-<select id="list" resultType="com.co.kr.vo.LoginDTO">
-        SELECT mb_id,mb_pw,mb_use FROM jsp.member
-    </select>
+    <!-- selectId -->
+	<select id="mbSelectList" resultType="com.co.kr.domain.LoginDomain" parameterType="hashMap">
+	    SELECT * FROM jsp.member WHERE mb_id=#{mbId}
+	</select>
+	
+    <!-- selectAll -->
+	<select id="mbAllList" resultType="com.co.kr.domain.LoginDomain">
+	    SELECT * FROM jsp.member
+	</select>
+	
+	<!-- create -->
+	<insert id="mbCreate" parameterType="com.co.kr.domain.LoginDomain" >
+	   INSERT INTO jsp.member(
+	    mb_id,
+        mb_pw,
+        mb_level,
+        mb_ip,
+        mb_use,
+        mb_create_at,
+        mb_update_at
+	   )  
+	   
+	   VALUES (
+	    #{mbId},
+        #{mbPw},
+        #{mbLevel},
+        #{mbIp},
+        #{mbUse},
+        now(),
+        now()
+	   )
+	</insert>
+	
+	<!-- duplicationCheck -->
+	<select id="mbDuplicationCheck" resultType="com.co.kr.domain.LoginDomain" parameterType="hashMap">
+	   SELECT * FROM jsp.member WHERE mb_id=#{mbId}
+	</select>
+	
+	<!-- update -->
+	<update id="mbUpdate" parameterType="com.co.kr.domain.LoginDomain">
+		UPDATE jsp.member SET
+		        mb_pw=#{mbPw},
+		        mb_level=#{mbLevel},
+	            mb_ip=#{mbIp},
+	            mb_use=#{mbUse}, 
+	            mb_update_at=now()  
+	    WHERE mb_id=#{mbId}
+	</update>
+	
+	<!-- delete -->
+	<delete id="mbRemove" parameterType="hashMap">
+	   DELETE FROM jsp.member WHERE mb_id=#{mbId}
+	</delete>
 </mapper>

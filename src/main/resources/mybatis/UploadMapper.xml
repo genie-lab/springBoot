@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+                        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.co.kr.mapper.UploadMapper">
+
+	<insert id="fileUpload" parameterType="com.co.kr.domain.FileListDomain">
+        INSERT INTO jsp.upload (
+            mb_id,   
+			up_original_file_name,                         
+			up_new_file_name,                      
+			up_file_path,                                   
+			up_file_size,                                 
+			up_title, 
+			up_content  
+        )
+        VALUES (
+            #{mbId},
+            #{upOriginalFileName},
+            #{upNewFileName},
+            #{upFilePath},
+            #{upFileSize},
+            #{upTitle},
+            #{upContent}
+        )
+	</insert>
+	
+    <select id="list" resultType="com.co.kr.domain.FileListDomain">
+        SELECT mb_id,   
+            up_original_file_name,                         
+            up_new_file_name,                      
+            up_file_path,                                   
+            up_file_size,                                 
+            up_title, 
+            up_content
+        FROM jsp.upload 
+    </select>
+    
+</mapper>

@@ -1,12 +1,13 @@
 package com.co.kr.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.co.kr.domain.LoginDomain;
 import com.co.kr.mapper.UserMapper;
-import com.co.kr.vo.LoginDTO;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -15,8 +16,33 @@ public class UserServiceImpl implements UserService {
 	private UserMapper userMapper;
 
 	@Override
-	public List<LoginDTO> list() {
-		// TODO Auto-generated method stub
-		return userMapper.list();
+	public void mbCreate(LoginDomain loginDomain) {
+		userMapper.mbCreate(loginDomain);
 	}
+
+	@Override
+	public LoginDomain mbDuplicationCheck(Map<String, String> map) {
+		return userMapper.mbDuplicationCheck(map);
+	}
+
+	@Override
+	public LoginDomain mbSelectList(Map<String, String> map) {
+		return userMapper.mbSelectList(map);
+	}
+
+	@Override
+	public List<LoginDomain> mbAllList() {
+		return userMapper.mbAllList();
+	}
+
+	@Override
+	public void mbUpdate(LoginDomain loginDomain) {
+		userMapper.mbUpdate(loginDomain);
+	}
+
+	@Override
+	public void mbRemove(Map<String, String> map) {
+		userMapper.mbRemove(map);
+	}
+	
 }
