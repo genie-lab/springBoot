@@ -144,12 +144,13 @@ public class UserController {
 	
 	//대시보드 리스트 보여주기
 	@GetMapping("mbEditList")
-	public ModelAndView mbListEdit(@RequestParam("mbId") String mbId) {
+	public ModelAndView mbListEdit(@RequestParam("mbSeq") String mbSeq) {
 		ModelAndView mav = new ModelAndView();
 		mav = mbListCall();  //리스트만 가져오기
 		Map map = new HashMap<String, String>();
-		map.put("mbId", mbId);
+		map.put("mbSeq", mbSeq);
 		LoginDomain loginDomain = userService.mbSelectList(map);
+		System.out.println("loginD=========="+loginDomain.getMbId());
 		mav.addObject("item",loginDomain);
 		mav.setViewName("admin/adminEditList.html");
 		return mav; 
@@ -181,24 +182,24 @@ public class UserController {
 	}
 	
 	//삭제
-	@GetMapping("/remove/{id}")
-    public ModelAndView mbRemove(@PathVariable("id") String mbId, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	@GetMapping("/remove/{mbSeq}")
+    public ModelAndView mbRemove(@PathVariable("mbSeq") String mbSeq, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModelAndView mav = new ModelAndView();
 		
 		Map map = new HashMap<String, String>();
-		map.put("mbId", mbId);
+		map.put("mbSeq", mbSeq);
 		userService.mbRemove(map);
 		
 		mav.setViewName("redirect:/mbList");
 		return mav;
 	}
 	
-	
 	//수정페이지 이동
-	@GetMapping("/modify/{id}")
-    public ModelAndView mbModify(@PathVariable("id") String mbId, RedirectAttributes re) throws IOException {
+	@GetMapping("/modify/{mbSeq}")
+    public ModelAndView mbModify(@PathVariable("mbSeq") String mbSeq, RedirectAttributes re) throws IOException {
+		System.out.println("mbSeq"+mbSeq);
 		ModelAndView mav = new ModelAndView();
-		re.addAttribute("mbId", mbId);
+		re.addAttribute("mbSeq", mbSeq);
 		mav.setViewName("redirect:/mbEditList");
 		return mav;
 	}
@@ -212,6 +213,7 @@ public class UserController {
 		LoginDomain loginDomain = null; //초기화
 		String IP = CommonUtils.getClientIP(request);
 		loginDomain = LoginDomain.builder()
+				.mbSeq(Integer.parseInt(loginDTO.getSeq()))
 				.mbId(loginDTO.getId())
 				.mbPw(loginDTO.getPw())
 				.mbLevel("2")

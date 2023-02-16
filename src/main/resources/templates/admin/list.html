@@ -40,8 +40,8 @@
 <!--                     </form> -->
 <!--                        <a th:href="@{/remove(id=${item.mbId})}"><button>삭제</button></a> -->
 <!--                        <a th:href="@{/remove(id = ${item.mbId})}"><button>삭제</button></a> -->
-                       <a th:href="@{/modify/{id}(id = ${item.mbId})}"><button>수정</button></a>
-                       <a th:href="@{/remove/{id}(id = ${item.mbId})}"><button>삭제</button></a>
+                       <a th:href="@{/modify/{mbSeq}(mbSeq = ${item.mbSeq})}"><button>수정</button></a>
+                       <a th:href="@{/remove/{mbSeq}(mbSeq = ${item.mbSeq})}"><button>삭제</button></a>
 <!--                    '/delete/' + ${resultList.id} -->
                 </td>
             </tr>

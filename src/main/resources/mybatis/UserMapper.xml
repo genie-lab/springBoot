@@ -5,7 +5,7 @@
 
     <!-- selectId -->
 	<select id="mbSelectList" resultType="com.co.kr.domain.LoginDomain" parameterType="hashMap">
-	    SELECT * FROM jsp.member WHERE mb_id=#{mbId}
+	    SELECT * FROM jsp.member WHERE mb_seq=#{mbSeq}
 	</select>
 	
     <!-- selectAll -->
@@ -49,11 +49,11 @@
 	            mb_ip=#{mbIp},
 	            mb_use=#{mbUse}, 
 	            mb_update_at=now()  
-	    WHERE mb_id=#{mbId}
+	    WHERE mb_seq=#{mbSeq}
 	</update>
 	
 	<!-- delete -->
 	<delete id="mbRemove" parameterType="hashMap">
-	   DELETE FROM jsp.member WHERE mb_id=#{mbId}
+	   DELETE FROM jsp.member WHERE mb_seq=#{mbSeq}
 	</delete>
 </mapper>

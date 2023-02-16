@@ -10,6 +10,7 @@ import lombok.ToString;
 @Setter
 @AllArgsConstructor
 public class LoginDTO {
+	private String seq;
 	private String id;
 	private String pw;
 	private String admin;
