@@ -26,15 +26,7 @@
             </div>
             <div class="content">
                 <div class="tit">SpringBoot STUDY</div>
-                <div class="form">
-<!--                     <form role="form" th:action="@{login.do}" th:object="${statLoginDTO}" action="#" id="loginForm" method="post"> -->
-<!--                         <input type="hidden" th:field="*{key}" required>  -->
-<!--                         <input type="hidden" th:field="*{value}" required>  -->
-<!--                         <input type="text" id="keyData" name="keyData" placeholder="id" required> -->
-<!--                         <input type="text" id="valueData" name="valueData" placeholder="password" required> -->
-<!--                         <button type="submit" id="submit">LOGIN</button> -->
-<!--                     </form> -->
-                                        
+                <div class="form">   
                     <form   id="loginForm" role="form" action="board" method="post">
 				        <input type="text" name ="id" id="id" placeholder="id" required> 
 				        <input type="text" name="pw" id="pw" placeholder="pw" required> 
@@ -49,27 +41,5 @@
         </div>
     </div>
 
-
-
-
-<!--     <tr th:each="list : ${listTest}"> -->
-<!--         <td th:text="${list}"></td> -->
-<!--         <td><a href="#" th:text="${message.pw}">Title ...</a></td> -->
-<!--         <td th:text="${message.text}">Text ...</td> -->
-<!--     </tr> -->
-<!--     <tr th:each="message : ${messages}"> -->
-<!--         <td th:text="${message.id}">1</td> -->
-<!--         <td th:text="${message.pw}">1</td> -->
-<!--         <td th:text="${message.mb_use}">1</td> -->
-        
-<!--         <td><a href="#" th:text="${message.title}">Title ...</a></td> -->
-<!--         <td th:text="${message.text}">Text ...</td> -->
-<!--     </tr> -->
-<!--     <span th:text="${ObjectTest}">1</span> -->
-<!--     <form   id="loginForm" role="form" th:action="@{login.do}" th:object="${loginDTO}" action="#"  method="post"> -->
-<!--         <input type="text" id="id" name="id" placeholder="id" required/> -->
-<!--         <input type="text" id="pw" name="pw" placeholder="pw" required/> -->
-<!--         <button type="submit" id="submit">LOGIN</button> -->
-<!--     </form> -->
 </body>
 </html>

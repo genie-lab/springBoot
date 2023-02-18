@@ -27,10 +27,6 @@ public class DbConfig {
 		return dataSource;
 	}
 
-	/**
-	 * 트랜잭션 매니저 등록
-	 * @return
-	 */
     @Bean
     public DataSourceTransactionManager transactionManager() {
         return new DataSourceTransactionManager(dataSource());

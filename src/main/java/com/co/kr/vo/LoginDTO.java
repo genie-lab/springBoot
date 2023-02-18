@@ -7,7 +7,6 @@ import lombok.ToString;
 
 @ToString
 @Getter
-@Setter
 @AllArgsConstructor
 public class LoginDTO {
 	private String seq;

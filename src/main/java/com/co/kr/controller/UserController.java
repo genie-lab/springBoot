@@ -225,7 +225,6 @@ public class UserController {
 		return mav;
 	}
 
-	@GetMapping("board")
 	@RequestMapping(value = "board")
 	public ModelAndView login(LoginDTO loginDTO, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
