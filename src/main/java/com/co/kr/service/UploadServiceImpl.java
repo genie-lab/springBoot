@@ -29,7 +29,7 @@ import com.co.kr.exception.InternalException;
 import com.co.kr.exception.RequestException;
 import com.co.kr.mapper.UploadMapper;
 import com.co.kr.util.CommonUtils;
-import com.co.kr.vo.FileListDTO;
+import com.co.kr.vo.FileListVO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,7 +42,7 @@ public class UploadServiceImpl implements UploadService {
 	UploadMapper uploadMapper;
 	
 	@Override
-	public ModelAndView fileProcess(FileListDTO fileListDTO, MultipartHttpServletRequest request) {
+	public ModelAndView fileProcess(FileListVO fileListDTO, MultipartHttpServletRequest request) {
 		
 		
 		request.getFiles("files");

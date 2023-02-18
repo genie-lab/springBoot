@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.co.kr.domain.LoginDomain;
-import com.co.kr.vo.LoginDTO;
+import com.co.kr.vo.LoginVO;
 
 @Mapper
 public interface UserMapper {

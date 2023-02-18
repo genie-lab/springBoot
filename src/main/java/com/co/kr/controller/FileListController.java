@@ -29,7 +29,7 @@ import com.co.kr.domain.FileListDomain;
 import com.co.kr.exception.InternalException;
 import com.co.kr.service.UploadService;
 import com.co.kr.util.CommonUtils;
-import com.co.kr.vo.FileListDTO;
+import com.co.kr.vo.FileListVO;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +43,7 @@ public class FileListController {
 
 	
 	@PostMapping(value = "/upload")
-	public ModelAndView upload( FileListDTO fileListDTO, MultipartHttpServletRequest request) throws IOException, ParseException {
+	public ModelAndView upload( FileListVO fileListDTO, MultipartHttpServletRequest request) throws IOException, ParseException {
 		
 		ModelAndView mav = new ModelAndView();
 		mav = uploadService.fileProcess(fileListDTO, request) ;

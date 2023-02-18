@@ -18,8 +18,8 @@ import org.springframework.web.servlet.view.RedirectView;
 import com.co.kr.domain.LoginDomain;
 import com.co.kr.service.UserService;
 import com.co.kr.util.CommonUtils;
-import com.co.kr.vo.LoginDTO;
-import com.co.kr.vo.SigninDTO;
+import com.co.kr.vo.LoginVO;
+import com.co.kr.vo.SigninVO;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -75,7 +75,7 @@ public class UserController {
 	
 	// 회원가입
 	@PostMapping("create")
-	public ModelAndView create(LoginDTO loginDTO, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public ModelAndView create(LoginVO loginDTO, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
 		ModelAndView mav = new ModelAndView();
 		
@@ -206,7 +206,7 @@ public class UserController {
 	
 	//수정업데이트
 	@RequestMapping("/update")
-	public ModelAndView mbModify(LoginDTO loginDTO, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public ModelAndView mbModify(LoginVO loginDTO, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModelAndView mav = new ModelAndView();
 		System.out.println("loginDTO"+ loginDTO);
 		
@@ -226,7 +226,7 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "board")
-	public ModelAndView login(LoginDTO loginDTO, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public ModelAndView login(LoginVO loginDTO, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
 		//session 처리 
 		HttpSession session = request.getSession();

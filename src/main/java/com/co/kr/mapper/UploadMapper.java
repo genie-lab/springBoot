@@ -5,7 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.co.kr.domain.FileListDomain;
-import com.co.kr.vo.LoginDTO;
+import com.co.kr.vo.LoginVO;
 
 @Mapper
 public interface UploadMapper {

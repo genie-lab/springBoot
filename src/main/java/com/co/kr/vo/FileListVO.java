@@ -6,9 +6,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.Data;
+import lombok.Getter;
 
-@Data
-public class FileListDTO {
+@Getter
+public class FileListVO {
 //
 //	@Value("${upload.file.path}")
 //	private String savePath;

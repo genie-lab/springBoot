@@ -8,9 +8,10 @@ import lombok.ToString;
 @ToString
 @Getter
 @AllArgsConstructor
-public class LoginDTO {
-	private String seq;
+public class SigninVO {
 	private String id;
 	private String pw;
-	private String admin;
+//	private String mb_use;
+//	private String mb_create_at;
+//	private String mb_update_at;
 }

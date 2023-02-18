@@ -7,12 +7,10 @@ import lombok.ToString;
 
 @ToString
 @Getter
-@Setter
 @AllArgsConstructor
-public class SigninDTO {
+public class LoginVO {
+	private String seq;
 	private String id;
 	private String pw;
-//	private String mb_use;
-//	private String mb_create_at;
-//	private String mb_update_at;
+	private String admin;
 }
