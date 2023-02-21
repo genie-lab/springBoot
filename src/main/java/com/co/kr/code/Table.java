@@ -7,7 +7,8 @@ public enum Table {
 
 	//쓰는 순서 중요
 	MEMBER("member"),
-	UPLOAD("upload");
+	FILES("files"),
+	BOARD("board");
 	
 	private String table;
 

@@ -2,37 +2,46 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
                         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.co.kr.mapper.UploadMapper">
-
-	<insert id="fileUpload" parameterType="com.co.kr.domain.FileListDomain">
-        INSERT INTO jsp.upload (
+    <!-- content insert -->
+	<insert id="contentUpload" parameterType="com.co.kr.domain.BoardContentDomain"
+	useGeneratedKeys="true"
+        keyProperty="bdSeq" keyColumn="bd_seq">
+	
+        INSERT INTO jsp.${table} (
             mb_id,   
-			up_original_file_name,                         
-			up_new_file_name,                      
-			up_file_path,                                   
-			up_file_size,                                 
-			up_title, 
-			up_content  
+			bd_title,                         
+			bd_content  
         )
         VALUES (
+            #{mbId},
+            #{bdTitle},
+            #{bdContent}
+        )
+	</insert>
+	
+	<!-- file insert -->
+	<insert id="fileUpload" parameterType="com.co.kr.domain.BoardFileDomain">
+        INSERT INTO jsp.${table} (
+            bd_seq,
+            mb_id,   
+            up_original_file_name,                         
+            up_new_file_name,                      
+            up_file_path,                                   
+            up_file_size
+        )
+        VALUES (
+            #{bdSeq},
             #{mbId},
             #{upOriginalFileName},
             #{upNewFileName},
             #{upFilePath},
-            #{upFileSize},
-            #{upTitle},
-            #{upContent}
+            #{upFileSize}
         )
-	</insert>
-	
-    <select id="list" resultType="com.co.kr.domain.FileListDomain">
-        SELECT mb_id,   
-            up_original_file_name,                         
-            up_new_file_name,                      
-            up_file_path,                                   
-            up_file_size,                                 
-            up_title, 
-            up_content
-        FROM jsp.upload 
+    </insert>
+    
+    <select id="boardList" resultType="com.co.kr.domain.BoardListDomain">
+        SELECT DISTINCT bd_seq, mb_id, bd_title, bd_create_at, bd_update_at
+        FROM jsp.view_board order by bd_update_at desc
     </select>
     
 </mapper>

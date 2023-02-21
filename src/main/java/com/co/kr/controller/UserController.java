@@ -15,9 +15,12 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
+import com.co.kr.domain.BoardListDomain;
 import com.co.kr.domain.LoginDomain;
+import com.co.kr.service.UploadService;
 import com.co.kr.service.UserService;
 import com.co.kr.util.CommonUtils;
+import com.co.kr.vo.FileListVO;
 import com.co.kr.vo.LoginVO;
 import com.co.kr.vo.SigninVO;
 
@@ -34,7 +37,11 @@ public class UserController {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private UploadService uploadService;
 
+	private FileListController fileListController;
 	
 	/**
 	 * 전체리스트
@@ -60,9 +67,18 @@ public class UserController {
 	
 	// 진입점
 	@GetMapping("/")
-	public String index() throws IOException {
-		return "index.html";
+	public String index(HttpServletRequest request) throws IOException {
+		HttpSession session = request.getSession();
+		System.out.println(session.getId());
+		System.out.println(session.getAttribute("id"));
+//		session.getAttribute("id");
 		
+		System.out.println("request.getSession().getId()");
+		if(session.getAttribute("id") != null) {
+			session.invalidate();
+		}
+		
+		return "index.html";
 	}
 	
 	// 회원가입 화면
@@ -87,45 +103,49 @@ public class UserController {
 		// 중복체크
 		Map<String, String> map = new HashMap();
 		map.put("mbId", loginDTO.getId());
-		LoginDomain dupleCheck = userService.mbDuplicationCheck(map);
+		map.put("mbPw", loginDTO.getPw());
 		
-		if(dupleCheck != null) { // 가입되있으면  
+		
+		// 중복체크
+		int dupleCheck = userService.mbDuplicationCheck(map);
+		System.out.println(dupleCheck);
+
+		if(dupleCheck > 0) { // 가입되있으면  
 			String alertText = "중복이거나 유효하지 않은 접근입니다";
 			String redirectPath = "/main";
 			System.out.println(loginDTO.getAdmin());
 			if(loginDTO.getAdmin() != null) {
 				redirectPath = "/main/mbList";
 			}
-			System.out.println(redirectPath);
 			CommonUtils.redirect(alertText, redirectPath, response);
-		}
-		
-		//현재아이피 추출
-		String IP = CommonUtils.getClientIP(request);
-		
-		
-		LoginDomain loginDomain = null; //초기화
-		 loginDomain = LoginDomain.builder()
-				.mbId(loginDTO.getId())
-				.mbPw(loginDTO.getPw())
-				.mbLevel("2")
-				.mbIp(IP)
-				.mbUse("Y")
-				.build();
-		
-		// 저장
-		userService.mbCreate(loginDomain);
-		
-		System.out.println(loginDomain.getMbId());
-		
-		if(loginDTO.getAdmin() == null) { // 'admin'들어있을때는 alert 스킵이다
-			// session 저장 
-			session.setAttribute("ip",IP);
-			session.setAttribute("id", loginDomain.getMbId());
-			session.setAttribute("mbLevel", "2"); 
-			mav.setViewName("redirect:/bdList");
-		}else { // admin일때
-			mav.setViewName("redirect:/mbList");
+		}else {
+			
+			//현재아이피 추출
+			String IP = CommonUtils.getClientIP(request);
+			
+			
+			LoginDomain loginDomain = null; //초기화
+			loginDomain = LoginDomain.builder()
+					.mbId(loginDTO.getId())
+					.mbPw(loginDTO.getPw())
+					.mbLevel("2")
+					.mbIp(IP)
+					.mbUse("Y")
+					.build();
+			
+			// 저장
+			userService.mbCreate(loginDomain);
+			
+			System.out.println(loginDomain.getMbId());
+			if(loginDTO.getAdmin() == null) { // 'admin'들어있을때는 alert 스킵이다
+				// session 저장 
+				session.setAttribute("ip",IP);
+				session.setAttribute("id", loginDomain.getMbId());
+				session.setAttribute("mbLevel", "2"); 
+				mav.setViewName("redirect:/bdList");
+			}else { // admin일때
+				mav.setViewName("redirect:/mbList");
+			}
 		}
 		
 		return mav;
@@ -171,10 +191,13 @@ public class UserController {
 		return mav;
 	}
 	
-	@GetMapping("bdList")
 	@RequestMapping(value = "bdList")
-	public ModelAndView bdList() {
+	public ModelAndView bdList(@ModelAttribute("fileListVO") FileListVO fileListVO) { 
+		//BindingResult nor plain target object for bean name 'fileListVO' available as request attribute
 		ModelAndView mav = new ModelAndView();
+		List<BoardListDomain> items = uploadService.boardList();
+		System.out.println("items ==> "+ items);
+		mav.addObject("items", items);
 //		List<LoginDomain> loginDomain = userService.mbAllList();
 //		mav.addObject("items", loginDomain);
 		mav.setViewName("board/boardList.html");
@@ -226,7 +249,7 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "board")
-	public ModelAndView login(LoginVO loginDTO, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public ModelAndView login(@ModelAttribute("fileListVO") FileListVO fileListVO, LoginVO loginDTO, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
 		//session 처리 
 		HttpSession session = request.getSession();
@@ -234,24 +257,38 @@ public class UserController {
 		// 중복체크
 		Map<String, String> map = new HashMap();
 		map.put("mbId", loginDTO.getId());
+		map.put("mbPw", loginDTO.getPw());
 		
+		System.out.println("dupleCheck0");
+		System.out.println("map"+ map.get("mbId"));
+
 		// 중복체크
-		LoginDomain dupleCheck = userService.mbDuplicationCheck(map);
+		int dupleCheck = userService.mbDuplicationCheck(map);
+		LoginDomain loginDomain = userService.mbGetId(map);
+		System.out.println("dupleCheck01"+dupleCheck);
 		
-		if(dupleCheck == null) {  
-			String alertText = "없는 아이디입니다. 가입해주세요";
+		if(dupleCheck == 0) {  
+			String alertText = "없는 아이디이거나 패스워드가 잘못되었습니다. 가입해주세요";
 			String redirectPath = "/main/signin";
 			CommonUtils.redirect(alertText, redirectPath, response);
 			return mav;
 		}
-		
+
+		System.out.println("dupleCheck1");
+
 		//현재아이피 추출
 		String IP = CommonUtils.getClientIP(request);
 		
-		// session 저장 
+		//session 저장
 		session.setAttribute("ip",IP);
-		session.setAttribute("id", dupleCheck.getMbId());
-		session.setAttribute("mbLevel", dupleCheck.getMbLevel());
+		session.setAttribute("id", loginDomain.getMbId());
+		session.setAttribute("mbLevel", loginDomain.getMbLevel());
+		
+		System.out.println("dupleCheck2");
+		
+		List<BoardListDomain> items = uploadService.boardList();
+		System.out.println("items ==> "+ items);
+		mav.addObject("items", items);
 		
 		mav.setViewName("board/boardList.html"); 
 		

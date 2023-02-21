@@ -17,10 +17,13 @@ public interface UserService {
     //신규
     public void mbCreate(LoginDomain loginDomain);
     
-    //중복체크 
-    public LoginDomain mbDuplicationCheck(Map<String, String> map);
+    //getMbIdCheck
+    public LoginDomain mbGetId(Map<String, String> map);
     
-    //update 
+    //login count 
+    public int mbDuplicationCheck(Map<String, String> map);
+    
+    //update
     public void mbUpdate(LoginDomain loginDomain); 
     
     //delete 

@@ -22,8 +22,11 @@ public interface UserMapper {
     //전체데이터
     public List<LoginDomain> mbAllList();
     
-    //login duplicationCheck
-    public LoginDomain mbDuplicationCheck(Map<String, String> map);
+    //login getMbIdCheck
+    public LoginDomain mbGetId(Map<String, String> map);
+    
+    //login count
+    public int mbDuplicationCheck(Map<String, String> map);
     
     //update
     public void mbUpdate(LoginDomain loginDomain);

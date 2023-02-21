@@ -17,7 +17,7 @@
     <title>보드정보</title>
 </head>
 
-<div layout:fragment="content">
+<div th:if=${session.id} layout:fragment="content">
     <div class="container">
         <th:block th:include="board/clause.html"></th:block>
         <th:block th:include="board/list.html"></th:block>

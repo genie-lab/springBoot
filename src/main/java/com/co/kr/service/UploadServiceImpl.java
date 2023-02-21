@@ -8,9 +8,14 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,7 +29,9 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMetho
 
 import com.co.kr.code.Code;
 import com.co.kr.code.Table;
-import com.co.kr.domain.FileListDomain;
+import com.co.kr.domain.BoardContentDomain;
+import com.co.kr.domain.BoardFileDomain;
+import com.co.kr.domain.BoardListDomain;
 import com.co.kr.exception.InternalException;
 import com.co.kr.exception.RequestException;
 import com.co.kr.mapper.UploadMapper;
@@ -42,12 +49,27 @@ public class UploadServiceImpl implements UploadService {
 	UploadMapper uploadMapper;
 	
 	@Override
-	public ModelAndView fileProcess(FileListVO fileListDTO, MultipartHttpServletRequest request) {
+	public void fileProcess(FileListVO fileListVO, MultipartHttpServletRequest request) {
+			
+				//session 생성
+				HttpSession session = request.getSession();
+				
+				//content domain 생성 
+				BoardContentDomain boardContentDomain = BoardContentDomain.builder()
+						.table(Table.BOARD.getTable())
+						.mbId(session.getAttribute("id").toString())
+						.bdTitle(fileListVO.getTitle())
+						.bdContent(fileListVO.getContent())
+						.build();
+				// db 저장
+				uploadMapper.contentUpload(boardContentDomain);
 		
-		
-		request.getFiles("files");
-		ModelAndView mav = new ModelAndView();
-//		try {
+				
+				int bdSeq = boardContentDomain.getBdSeq();
+				String mbId = boardContentDomain.getMbId();
+				System.out.println("getBdSeq=====>>>>>>"+bdSeq);
+				
+				
 				List<MultipartFile> multipartFiles = request.getFiles("files");
 				
 				//파일 존재하지 않을 경우
@@ -55,34 +77,22 @@ public class UploadServiceImpl implements UploadService {
 					throw RequestException.fire(Code.E404, "잘못된 업로드 파일", HttpStatus.NOT_FOUND);
 				}
 
-				
-				//root path, new File("") == root path
-				Path basicPath = Paths.get(new File("C://").toString(),"upload").toAbsolutePath().normalize();
-				System.out.println(basicPath);
-				
-				String strPath = basicPath.toString() + File.separator; // separator 추가
-				Path rootPath = Paths.get(strPath).toAbsolutePath().normalize(); // 절대경로
-				
+				Path rootPath = Paths.get(new File("C://").toString(),"upload", File.separator).toAbsolutePath().normalize();			
 				File pathCheck = new File(rootPath.toString());
-				
-
 				
 				// folder chcek
 				if(!pathCheck.exists()) pathCheck.mkdirs();
 				
 				List list = new ArrayList();
-				///////////////////////////////////////////////////////
 				
-
 				for(MultipartFile multipartFile : multipartFiles) {
-					
 					
 					//확장자 추출
 					String originalFileExtension;
 					String contentType = multipartFile.getContentType();
-					
+		            String origFilename = multipartFile.getOriginalFilename();
 
-					//확장자 조재안을경우
+		            //확장자 조재안을경우
 					if(ObjectUtils.isEmpty(contentType)){
 						break;
 					}else { // 확장자가 jpeg, png인 파일들만 받아서 처리
@@ -100,94 +110,50 @@ public class UploadServiceImpl implements UploadService {
 					String current = CommonUtils.currentTime();
 					//System.out.println(current);
 					String newFileName = uuid + current + originalFileExtension;
-					
 					System.out.println(newFileName);
-					
 					
 					//경로에 파일저장
-				
 					Path targetPath = rootPath.resolve(newFileName);
-					
-					System.out.println(targetPath);
-					
-//					multipartFile.transferTo(targetPath);
-
-					System.out.println(newFileName);
+					System.out.println("targetPath=====> "+targetPath);
 					
 					File file = new File(targetPath.toString());
-					//파일복사저장  // 파일/ 패스 /옵션
+	
 					try {
-						Files.copy(multipartFile.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+						//파일복사저장
+						multipartFile.transferTo(file);
+		                // 파일 권한 설정(쓰기, 읽기)
+		                file.setWritable(true);
+		                file.setReadable(true);
+		                
+		                
+						//파일 domain 생성 
+						BoardFileDomain boardFileDomain = BoardFileDomain.builder()
+								.table(Table.FILES.getTable())
+								.bdSeq(bdSeq)
+								.mbId(mbId)
+								.upOriginalFileName(origFilename)
+								.upNewFileName(newFileName)
+								.upFilePath(targetPath.toString())
+								.upFileSize(Long.valueOf(multipartFile.getSize()).intValue())
+								.build();
+						
+						// db 저장
+						uploadMapper.fileUpload(boardFileDomain);
+		                
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						throw RequestException.fire(Code.E404, "잘못된 업로드 파일", HttpStatus.NOT_FOUND);
 					}
-					// inputstream 닫기;
 					
-					file.setWritable(true);
-					file.setReadable(true);
-					
-					System.out.println("sdfsdf");
-
-					
-					//파일 domain 생성 
-					FileListDomain fileListDomain = FileListDomain.builder()
-							.table(Table.UPLOAD.getTable())
-							.mbId(fileListDTO.getMbId())
-							.upOriginalFileName(multipartFile.getOriginalFilename())
-							.upNewFileName(newFileName)
-							.upFilePath(targetPath.toString())
-							.upFileSize(Long.valueOf(multipartFile.getSize()).intValue())
-							.upTitle(fileListDTO.getTitle())
-							.upContent(fileListDTO.getContent())
-							.build();
-					
-					try {
-						multipartFile.getInputStream().close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-//					System.getProperty("java.io.tmpdir");
-					
-//					FileListDomain fileListDomain = FileListDomain.builder()
-//							.table(Table.UPLOAD.getTable())
-//							.mbId(fileListDTO.getMbId())
-//							.upOriginalFileName("c")
-//							.upNewFileName("c")
-//							.upFilePath("c")
-//							.upFileSize(Long.valueOf(1L).intValue())
-//							.upTitle(fileListDTO.getTitle())
-//							.upContent(fileListDTO.getContent())
-//							.build();
-					
-
-					// db 저장
-					uploadMapper.fileUpload(fileListDomain);
-					
-//					List<FileListDomain> data =  list();
-					list.add(fileListDomain);
-
-					System.out.println("fileListDomain" +list);
+					System.out.println("upload done");
 				}
-					mav.addObject("fileList",list);
-					mav.setViewName("board.html");
-			
-//		} catch (Exception e) {
-//			// TODO: handle exception
-//			log.info("[uplaodAPI ] DB error");
-//			throw RequestException.fire(Code.E400); //디비연동실페 
-//			
-//		}
-		
-		return mav;
-		
+
 	}
+	
+	
 
 	@Override
-	public List<FileListDomain> list() {
-		
-		return uploadMapper.list();
+	public List<BoardListDomain> boardList() {
+		return uploadMapper.boardList();
 	}
 
 }

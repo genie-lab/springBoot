@@ -7,16 +7,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class FileListVO {
 //
 //	@Value("${upload.file.path}")
 //	private String savePath;
 //	
-	private String mbId;
+//	private String mbId;
 	private String title;
 	private String content;
-	private List<MultipartFile> files;
+//	private List<MultipartFile> files;
 	
 }

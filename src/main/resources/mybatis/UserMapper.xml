@@ -36,8 +36,13 @@
 	   )
 	</insert>
 	
+	<!-- mbGetId -->
+	<select id="mbDuplicationCheck" resultType="int" parameterType="hashMap">
+	   SELECT COUNT(*) FROM jsp.member WHERE mb_id=#{mbId} AND mb_pw=#{mbPw}
+	</select>
+	
 	<!-- duplicationCheck -->
-	<select id="mbDuplicationCheck" resultType="com.co.kr.domain.LoginDomain" parameterType="hashMap">
+	<select id="mbGetId" resultType="com.co.kr.domain.LoginDomain" parameterType="hashMap">
 	   SELECT * FROM jsp.member WHERE mb_id=#{mbId}
 	</select>
 	

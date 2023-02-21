@@ -21,11 +21,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public LoginDomain mbDuplicationCheck(Map<String, String> map) {
-		return userMapper.mbDuplicationCheck(map);
-	}
-
-	@Override
 	public LoginDomain mbSelectList(Map<String, String> map) {
 		return userMapper.mbSelectList(map);
 	}
@@ -44,5 +39,16 @@ public class UserServiceImpl implements UserService {
 	public void mbRemove(Map<String, String> map) {
 		userMapper.mbRemove(map);
 	}
-	
+
+	@Override
+	public LoginDomain mbGetId(Map<String, String> map) {
+		return userMapper.mbGetId(map);
+	}
+
+	@Override
+	public int mbDuplicationCheck(Map<String, String> map) {
+		// TODO Auto-generated method stub
+		return userMapper.mbDuplicationCheck(map);
+	}
+
 }

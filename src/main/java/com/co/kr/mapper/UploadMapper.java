@@ -4,14 +4,18 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import com.co.kr.domain.FileListDomain;
-import com.co.kr.vo.LoginVO;
+import com.co.kr.domain.BoardContentDomain;
+import com.co.kr.domain.BoardFileDomain;
+import com.co.kr.domain.BoardListDomain;
 
 @Mapper
 public interface UploadMapper {
 	
-	//upload
-	public void fileUpload(FileListDomain fileListDomain);
-	public List<FileListDomain> list();
+	//content upload
+	public void contentUpload(BoardContentDomain boardContentDomain);
+	//file upload
+	public void fileUpload(BoardFileDomain boardFileDomain);
+	//list
+	public List<BoardListDomain> boardList();
 	
 }
