@@ -16,7 +16,8 @@ public class FileListVO {
 //	@Value("${upload.file.path}")
 //	private String savePath;
 //	
-//	private String mbId;
+	private String isEdit;
+	private String seq;
 	private String title;
 	private String content;
 //	private List<MultipartFile> files;

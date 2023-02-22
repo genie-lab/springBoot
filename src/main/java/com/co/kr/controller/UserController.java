@@ -206,7 +206,7 @@ public class UserController {
 	
 	//삭제
 	@GetMapping("/remove/{mbSeq}")
-    public ModelAndView mbRemove(@PathVariable("mbSeq") String mbSeq, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ModelAndView mbRemove(@PathVariable("mbSeq") String mbSeq) throws IOException {
 		ModelAndView mav = new ModelAndView();
 		
 		Map map = new HashMap<String, String>();

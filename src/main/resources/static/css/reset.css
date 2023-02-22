@@ -33,7 +33,7 @@ h1, h2, h3, h4, h5, h6, p,
 a, strong,
 dl, dt, dd, ol, ul, li,
 fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
+table, caption, tbody, tfoot, thead, tr, th, td, textarea, input,
 article, aside,
 button,
 pre {font-family:'Noto Sans KR','돋움','Nanum Barun Gothic',Dotum, Arial, Helvetica, AppleGothic, sans-serif}

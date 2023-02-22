@@ -8,7 +8,6 @@ import lombok.Data;
 public class BoardContentDomain {
 
 	
-	private String table;
 	
 	private Integer bdSeq;
 	private String mbId;
