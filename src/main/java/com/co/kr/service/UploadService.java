@@ -21,7 +21,7 @@ import com.co.kr.vo.LoginVO;
 public interface UploadService {
 	
 	//인서트
-	public void fileProcess(FileListVO fileListVO, MultipartHttpServletRequest request, HttpServletRequest httpReq);
+	public int fileProcess(FileListVO fileListVO, MultipartHttpServletRequest request, HttpServletRequest httpReq);
 	
 	// 전체 리스트 조회
 	public List<BoardListDomain> boardList();
