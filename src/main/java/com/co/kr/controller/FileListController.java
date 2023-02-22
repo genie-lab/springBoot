@@ -68,11 +68,12 @@ public class FileListController {
 		System.out.println(request.getFiles("files"));
 		System.out.println("============================");
 		ModelAndView mav = new ModelAndView();
-		uploadService.fileProcess(fileListVO, request, httpReq);
+		int bdSeq = uploadService.fileProcess(fileListVO, request, httpReq);
 		fileListVO.setContent(""); //초기화
 		fileListVO.setTitle(""); //초기화
 		
-		mav = bdListCall();
+		// 화면에서 넘어올때는 bdSeq String이라 string으로 변환해서 넣어즘
+		mav = bdSelectOneCall(String.valueOf(bdSeq),request);
 		mav.setViewName("board/boardList.html");
 		return mav;
 		
@@ -164,7 +165,6 @@ public class FileListController {
 		
 		return mav;
 	}
-	
 	
 	@GetMapping("edit")
 	public ModelAndView edit(@ModelAttribute("fileListVO") FileListVO fileListVO, @RequestParam("bdSeq") String bdSeq, HttpServletRequest request) throws IOException {

@@ -52,7 +52,7 @@ public class UploadServiceImpl implements UploadService {
 	UploadMapper uploadMapper;
 	
 	@Override
-	public void fileProcess(FileListVO fileListVO, MultipartHttpServletRequest request, HttpServletRequest httpReq) {
+	public int fileProcess(FileListVO fileListVO, MultipartHttpServletRequest request, HttpServletRequest httpReq) {
 		//session 생성
 		HttpSession session = httpReq.getSession();
 		
@@ -221,7 +221,8 @@ public class UploadServiceImpl implements UploadService {
 
 				}
 				
-				
+		
+				return bdSeq; // 저장된 게시판 번호
 	}
 				
 
