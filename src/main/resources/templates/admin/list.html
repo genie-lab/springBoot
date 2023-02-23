@@ -50,4 +50,19 @@
             </tr>
         </tbody>
     </table>
+    
+<!--         <ul >         -->
+    <div class="pagination">
+	        <th:block th:each="num, numStat : ${totalpage}">
+<!-- 		        <li> -->
+<!-- 		        <div> -->
+		        
+<!-- 		               <a  th:href="@{mbList(page=${numStat.count})}" th:text="${numStat.count}"></a> -->
+		               <a class="on" th:href="@{mbList(page=${numStat.count})}" th:text="${numStat.count}"></a>
+<!-- 		        </div> -->
+<!-- 		        </li> -->
+	        </th:block>
+    </div>
+<!--         </ul> -->
+    
 </div>

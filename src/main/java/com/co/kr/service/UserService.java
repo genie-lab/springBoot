@@ -12,7 +12,10 @@ public interface UserService {
     public LoginDomain mbSelectList(Map<String, String> map);
     
     // selectAll
-    public List<LoginDomain> mbAllList();
+    public List<LoginDomain> mbAllList(Map<String, Integer> map);
+    
+    // selectAll Conut
+    public int mbGetAll();
     
     //신규
     public void mbCreate(LoginDomain loginDomain);

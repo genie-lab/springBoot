@@ -9,8 +9,8 @@
 	</select>
 	
     <!-- selectAll -->
-	<select id="mbAllList" resultType="com.co.kr.domain.LoginDomain">
-	    SELECT * FROM jsp.member
+	<select id="mbAllList" resultType="com.co.kr.domain.LoginDomain" parameterType="map">
+	    SELECT * FROM jsp.member order by mb_update_at desc limit #{offset}, #{contentnum}
 	</select>
 	
 	<!-- create -->
@@ -35,6 +35,11 @@
         now()
 	   )
 	</insert>
+	
+	<!-- mbGetAll -->
+	<select id="mbGetAll" resultType="int">
+	   SELECT COUNT(*) FROM jsp.member
+	</select>
 	
 	<!-- mbGetId -->
 	<select id="mbDuplicationCheck" resultType="int" parameterType="hashMap">

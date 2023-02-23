@@ -1,5 +1,6 @@
 package com.co.kr.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,8 +27,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<LoginDomain> mbAllList() {
-		return userMapper.mbAllList();
+	public List<LoginDomain> mbAllList(Map<String, Integer> map) { 
+		return userMapper.mbAllList(map);
 	}
 
 	@Override
@@ -49,6 +50,12 @@ public class UserServiceImpl implements UserService {
 	public int mbDuplicationCheck(Map<String, String> map) {
 		// TODO Auto-generated method stub
 		return userMapper.mbDuplicationCheck(map);
+	}
+
+	@Override
+	public int mbGetAll() {
+		// TODO Auto-generated method stub
+		return userMapper.mbGetAll();
 	}
 
 }

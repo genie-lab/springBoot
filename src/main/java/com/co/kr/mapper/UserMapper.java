@@ -20,7 +20,10 @@ public interface UserMapper {
     public void mbCreate(LoginDomain loginDomain);
     
     //전체데이터
-    public List<LoginDomain> mbAllList();
+    public List<LoginDomain> mbAllList(Map<String, Integer> map);
+    
+    // mbGetAll
+    public int mbGetAll();
     
     //login getMbIdCheck
     public LoginDomain mbGetId(Map<String, String> map);

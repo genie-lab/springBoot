@@ -154,40 +154,115 @@ public class UserController {
 	
 	
 	//대시보드 리스트 보여주기
-	@GetMapping("mbList")
-	public ModelAndView mbList() {
+	@GetMapping("mbList") // required=false null 일때 받기 에러금지 // querystring == @RequestParam
+	public ModelAndView mbList(@RequestParam(value="page") String page,
+			 HttpServletRequest request
+			) {
+		
+		//page 초기화
+		HttpSession session = request.getSession();
+//		if(session.getAttribute("page") !=null) {			
+//			page = (String) session.getAttribute("page");
+//			System.out.println("clickPage0="+page); 
+//		}else if(page == null) {
+//			page = "1"; 
+//			System.out.println("clickPage1="+page); 
+//		}
+		
+		session.setAttribute("page", page);
+		System.out.println("clickPage3="+page);
 		ModelAndView mav = new ModelAndView();
-		mav = mbListCall();  //리스트만 가져오기
+		
+		mav = mbListCall(page, request);  //리스트만 가져오기
+		//페이지네이션
+		
 		mav.setViewName("admin/adminList.html");
 		return mav; 
 	}
 	
 	//대시보드 리스트 보여주기
 	@GetMapping("mbEditList")
-	public ModelAndView mbListEdit(@RequestParam("mbSeq") String mbSeq) {
+	public ModelAndView mbListEdit(@RequestParam("mbSeq") String mbSeq, 
+			@RequestParam(value="page", required = false) String page,
+			HttpServletRequest request
+			) {
+		
+		//page 초기화
+		HttpSession session = request.getSession();
+		if(session.getAttribute("page") !=null) {			
+			page = (String) session.getAttribute("page");
+		}else if(page == null) {
+			page = "1"; 
+		}
 		ModelAndView mav = new ModelAndView();
-		mav = mbListCall();  //리스트만 가져오기
+		mav = mbListCall(page, request);  //리스트만 가져오기
 		Map map = new HashMap<String, String>();
 		map.put("mbSeq", mbSeq);
 		LoginDomain loginDomain = userService.mbSelectList(map);
-		System.out.println("loginD=========="+loginDomain.getMbId());
 		mav.addObject("item",loginDomain);
 		mav.setViewName("admin/adminEditList.html");
 		return mav; 
 	}
 	
 	//리스트 가져오기 따로 함수뺌
-	public ModelAndView mbListCall() {
+    public ModelAndView mbListCall(String clickPage, HttpServletRequest request) { //클릭페이지 널이면 
 		ModelAndView mav = new ModelAndView();
-		List<LoginDomain> loginDomain = userService.mbAllList();
+		//페이지네이션 추가  SELECT * FROM jsp.member order by mb_update_at limit 1, 5; {offset}{limit}
+		// 전체갯수
+		//pagenation
+		
+		// 페이지 저장
+		System.out.println("pageBlock====>"+clickPage);
+		HttpSession session = request.getSession();
+		session.setAttribute("page", clickPage);
+		Integer pageBlock = Integer.parseInt(clickPage);
+		
+		
+		//전체 갯수
+		int totalcount = userService.mbGetAll();
+		//전체 페이지수  totalpage 10개면 for문으로 1-10까지 만든다.
+		int contentnum = 10;
+		int totalpage = totalcount / contentnum;
+        if(totalcount % contentnum > 0){
+            totalpage++;
+        }
+        
+//        startPage = pageBlock == 1 ? 0 : pageBlock; // 음수일때는 0
+        int offset;
+        if(pageBlock == 1) {
+        	offset = 0; //1이면 offset 0 
+        }else {        	
+        	offset = ((pageBlock)*contentnum)-contentnum; //페이지 2클릭시 11부터 시작
+        }
+//        startPage = startPage < 0 ? 0 : startPage; // 음수일때는 0
+		System.out.println("offset"+offset);
+        Map map = new HashMap<String, Integer>();
+        map.put("offset",offset);
+        map.put("contentnum",contentnum);
+		
+		List<LoginDomain> loginDomain = userService.mbAllList(map);
+		System.out.println(loginDomain.size());
+		System.out.println("loginDomain"+loginDomain);
+		System.out.println("offset"+offset);
+		System.out.println("totalpage"+totalpage);
+		System.out.println("totalcount"+totalcount);
+		
 		boolean itemIsEmpty;
 		if(loginDomain.isEmpty()) {
 			itemIsEmpty = false;
 		}else {
 			itemIsEmpty = true;
 		}
+		
+		// 타임리프에서 for문 돌리려면 
+		List<Integer> list = new ArrayList();
+		for(int i=0; i < totalpage; i++) {
+			list.add(i);
+		}
+		
 		mav.addObject("itemsIsEmpty", itemIsEmpty);
 		mav.addObject("items", loginDomain);
+		mav.addObject("totalpage", list);
 		return mav;
 	}
 	
@@ -206,13 +281,26 @@ public class UserController {
 	
 	//삭제
 	@GetMapping("/remove/{mbSeq}")
-    public ModelAndView mbRemove(@PathVariable("mbSeq") String mbSeq) throws IOException {
+    public ModelAndView mbRemove(
+    		@PathVariable("mbSeq") String mbSeq,
+    		RedirectAttributes re,
+    		HttpServletRequest request
+    		) throws IOException {
 		ModelAndView mav = new ModelAndView();
 		
 		Map map = new HashMap<String, String>();
 		map.put("mbSeq", mbSeq);
 		userService.mbRemove(map);
 		
+		//page 초기화
+		HttpSession session = request.getSession();
+		String page;  // 삭제시에는 보던 리스트로 가야하기때문에 세션이용한다.
+		if(session.getAttribute("page") !=null) {			
+			 page = (String) session.getAttribute("page");
+		}else {
+			page = "1"; 
+		}
+		re.addAttribute("page", page);
 		mav.setViewName("redirect:/mbList");
 		return mav;
 	}
@@ -220,7 +308,6 @@ public class UserController {
 	//수정페이지 이동
 	@GetMapping("/modify/{mbSeq}")
     public ModelAndView mbModify(@PathVariable("mbSeq") String mbSeq, RedirectAttributes re) throws IOException {
-		System.out.println("mbSeq"+mbSeq);
 		ModelAndView mav = new ModelAndView();
 		re.addAttribute("mbSeq", mbSeq);
 		mav.setViewName("redirect:/mbEditList");
@@ -229,9 +316,22 @@ public class UserController {
 	
 	//수정업데이트
 	@RequestMapping("/update")
-	public ModelAndView mbModify(LoginVO loginDTO, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public ModelAndView mbModify(
+			LoginVO loginDTO, 
+			HttpServletRequest request, 
+			RedirectAttributes re
+			) throws IOException {
+		
+		
+		
+		
 		ModelAndView mav = new ModelAndView();
 		System.out.println("loginDTO"+ loginDTO);
+		
+//		//page 초기화
+		HttpSession session = request.getSession();
+		String page = "1"; // 업데이트 되면 가장 첫화면으로 가야한다. 
+		
 		
 		LoginDomain loginDomain = null; //초기화
 		String IP = CommonUtils.getClientIP(request);
@@ -244,6 +344,7 @@ public class UserController {
 				.mbUse("Y")
 				.build();
 		userService.mbUpdate(loginDomain);
+		re.addAttribute("page",page);
 		mav.setViewName("redirect:/mbList");
 		return mav;
 	}
