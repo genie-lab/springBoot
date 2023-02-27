@@ -1,32 +1,36 @@
 package com.co.kr.controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.view.RedirectView;
 
 import com.co.kr.domain.BoardListDomain;
 import com.co.kr.domain.LoginDomain;
 import com.co.kr.service.UploadService;
 import com.co.kr.service.UserService;
 import com.co.kr.util.CommonUtils;
+import com.co.kr.util.Pagination;
 import com.co.kr.vo.FileListVO;
 import com.co.kr.vo.LoginVO;
-import com.co.kr.vo.SigninVO;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,7 +45,6 @@ public class UserController {
 	@Autowired
 	private UploadService uploadService;
 
-	private FileListController fileListController;
 	
 	/**
 	 * 전체리스트
@@ -91,15 +94,16 @@ public class UserController {
 	
 	// 회원가입
 	@PostMapping("create")
-	public ModelAndView create(LoginVO loginDTO, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public ModelAndView create(LoginVO loginDTO, HttpServletRequest request,HttpServletResponse response) throws IOException {
 		
 		ModelAndView mav = new ModelAndView();
 		
 		//session 처리 
 		HttpSession session = request.getSession();
 //		RedirectView red = new RedirectView();
-		System.out.println(loginDTO);
-		
+		System.out.println("response"+response);
+		String page = (String) session.getAttribute("page");
+		if(page == null)page = "1";
 		// 중복체크
 		Map<String, String> map = new HashMap();
 		map.put("mbId", loginDTO.getId());
@@ -115,7 +119,7 @@ public class UserController {
 			String redirectPath = "/main";
 			System.out.println(loginDTO.getAdmin());
 			if(loginDTO.getAdmin() != null) {
-				redirectPath = "/main/mbList";
+				redirectPath = "/main/mbList?page="+page;
 			}
 			CommonUtils.redirect(alertText, redirectPath, response);
 		}else {
@@ -123,20 +127,36 @@ public class UserController {
 			//현재아이피 추출
 			String IP = CommonUtils.getClientIP(request);
 			
+			//자동생성 
+//			for (int i = 1; i < 126; i++) {
+//				
+//				LoginDomain loginDomain = null; //초기화
+//				loginDomain = LoginDomain.builder()
+//						.mbId(String.valueOf(i))
+//						.mbPw(String.valueOf(i))
+//						.mbLevel("2")
+//						.mbIp(IP)
+//						.mbUse("Y")
+//						.build();
+//				
+//				// 저장
+//				userService.mbCreate(loginDomain);
+//			}
 			
-			LoginDomain loginDomain = null; //초기화
-			loginDomain = LoginDomain.builder()
+			
+//			
+			LoginDomain loginDomain = LoginDomain.builder()
 					.mbId(loginDTO.getId())
 					.mbPw(loginDTO.getPw())
 					.mbLevel("2")
 					.mbIp(IP)
 					.mbUse("Y")
 					.build();
-			
-			// 저장
+//			
+//			// 저장
 			userService.mbCreate(loginDomain);
 			
-			System.out.println(loginDomain.getMbId());
+//			System.out.println(loginDomain.getMbId());
 			if(loginDTO.getAdmin() == null) { // 'admin'들어있을때는 alert 스킵이다
 				// session 저장 
 				session.setAttribute("ip",IP);
@@ -144,7 +164,7 @@ public class UserController {
 				session.setAttribute("mbLevel", "2"); 
 				mav.setViewName("redirect:/bdList");
 			}else { // admin일때
-				mav.setViewName("redirect:/mbList");
+				mav.setViewName("redirect:/mbList?page=1");
 			}
 		}
 		
@@ -169,8 +189,10 @@ public class UserController {
 //			System.out.println("clickPage1="+page); 
 //		}
 		
+//		String page1 = request.getParameter("page");
+		if(page == null) page = "1";
 		session.setAttribute("page", page);
-		System.out.println("clickPage3="+page);
+//		System.out.println("clickPage3="+page);
 		ModelAndView mav = new ModelAndView();
 		
 		mav = mbListCall(page, request);  //리스트만 가져오기
@@ -220,31 +242,47 @@ public class UserController {
 		
 		//전체 갯수
 		int totalcount = userService.mbGetAll();
-		//전체 페이지수  totalpage 10개면 for문으로 1-10까지 만든다.
 		int contentnum = 10;
-		int totalpage = totalcount / contentnum;
-        if(totalcount % contentnum > 0){
-            totalpage++;
-        }
-        
-//        startPage = pageBlock == 1 ? 0 : pageBlock; // 음수일때는 0
-        int offset;
-        if(pageBlock == 1) {
-        	offset = 0; //1이면 offset 0 
-        }else {        	
-        	offset = ((pageBlock)*contentnum)-contentnum; //페이지 2클릭시 11부터 시작
-        }
-//        startPage = startPage < 0 ? 0 : startPage; // 음수일때는 0
-		System.out.println("offset"+offset);
+
+		Map<String,Object> map1 = Pagination.pagination(totalcount, request);
+//		Map<String,Object> map1 = Pagination.uploadPagination(totalcount, contentnum, request);
+		
+		System.out.println("map"+" /rowNUM "+
+				map1.get("rowNUM") +" /pageNum "+
+				map1.get("pageNum") +" /startpage "+
+				map1.get("startpage") +" /endpage "+
+				map1.get("endpage") +" /offset "+
+				map1.get("offset") +" ");
+//		map.put("rowNUM", rowNUM);
+//		map.put("pageNum", pageNum);
+//		map.put("startpage", startpage);
+//		map.put("endpage", endpage);
+//		map.put("offset", offset);
+		//전체 페이지수  totalpage 10개면 for문으로 1-10까지 만든다.
+//		int totalpage = totalcount / contentnum;
+//        if(totalcount % contentnum > 0){
+//            totalpage++;
+//        }
+//        
+//        
+////        startPage = pageBlock == 1 ? 0 : pageBlock; // 음수일때는 0
+//        int offset;
+//        if(pageBlock == 1) {
+//        	offset = 0; //1이면 offset 0 
+//        }else {        	
+//        	offset = ((pageBlock)*contentnum)-contentnum; //페이지 2클릭시 11부터 시작
+//        }
+////        startPage = startPage < 0 ? 0 : startPage; // 음수일때는 0
+//		System.out.println("offset"+offset);
         Map map = new HashMap<String, Integer>();
-        map.put("offset",offset);
+        map.put("offset",map1.get("offset"));
         map.put("contentnum",contentnum);
 		
 		List<LoginDomain> loginDomain = userService.mbAllList(map);
 		System.out.println(loginDomain.size());
 		System.out.println("loginDomain"+loginDomain);
-		System.out.println("offset"+offset);
-		System.out.println("totalpage"+totalpage);
+//		System.out.println("offset"+offset);
+//		System.out.println("totalpage"+totalpage);
 		System.out.println("totalcount"+totalcount);
 		
 		boolean itemIsEmpty;
@@ -255,14 +293,17 @@ public class UserController {
 		}
 		
 		// 타임리프에서 for문 돌리려면 
-		List<Integer> list = new ArrayList();
-		for(int i=0; i < totalpage; i++) {
-			list.add(i);
-		}
+//		List<Integer> list = new ArrayList();
+//		for(int i=0; i < totalpage; i++) {
+//			list.add(i);
+//		}
 		
 		mav.addObject("itemsIsEmpty", itemIsEmpty);
 		mav.addObject("items", loginDomain);
-		mav.addObject("totalpage", list);
+		mav.addObject("rowNUM", map1.get("rowNUM"));
+		mav.addObject("pageNum", map1.get("pageNum"));
+		mav.addObject("startpage", map1.get("startpage"));
+		mav.addObject("endpage", map1.get("endpage"));
 		return mav;
 	}
 	
