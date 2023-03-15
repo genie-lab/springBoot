@@ -62,7 +62,7 @@ public class FileListController {
 
 	
 	@PostMapping(value = "upload")
-	public ModelAndView bdUpload(@ModelAttribute("fileListVO") FileListVO fileListVO, MultipartHttpServletRequest request, HttpServletRequest httpReq) throws IOException, ParseException {
+	public ModelAndView bdUpload(FileListVO fileListVO, MultipartHttpServletRequest request, HttpServletRequest httpReq) throws IOException, ParseException {
 		
 		System.out.println(fileListVO.getTitle() + fileListVO.getContent()+fileListVO.getSeq());
 		System.out.println(request.getFiles("files"));
@@ -73,7 +73,7 @@ public class FileListController {
 		fileListVO.setTitle(""); //초기화
 		
 		// 화면에서 넘어올때는 bdSeq String이라 string으로 변환해서 넣어즘
-		mav = bdSelectOneCall(String.valueOf(bdSeq),request);
+		mav = bdSelectOneCall(fileListVO, String.valueOf(bdSeq),request);
 		mav.setViewName("board/boardList.html");
 		return mav;
 		
@@ -90,7 +90,7 @@ public class FileListController {
 	}
 	
 	//리스트 하나 가져오기 따로 함수뺌
-	public ModelAndView bdSelectOneCall(String bdSeq, HttpServletRequest request) {
+	public ModelAndView bdSelectOneCall(@ModelAttribute("fileListVO") FileListVO fileListVO, String bdSeq, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		System.out.println("bdSeq"+bdSeq);
 		HashMap<String, Object> map = new HashMap<String, Object>();
@@ -98,6 +98,7 @@ public class FileListController {
 		
 		map.put("bdSeq", Integer.parseInt(bdSeq));
 		BoardListDomain boardListDomain =uploadService.boardSelectOne(map);
+		System.out.println("boardListDomain"+boardListDomain);
 		List<BoardFileDomain> fileList =  uploadService.boardSelectOneFile(map);
 		
 		for (BoardFileDomain list : fileList) {
@@ -117,14 +118,14 @@ public class FileListController {
     public ModelAndView bdDetail(@ModelAttribute("fileListVO") FileListVO fileListVO, @RequestParam("bdSeq") String bdSeq, HttpServletRequest request) throws IOException {
 		ModelAndView mav = new ModelAndView();
 		//하나파일 가져오기
-		mav = bdSelectOneCall(bdSeq,request);
+		mav = bdSelectOneCall(fileListVO, bdSeq,request);
 		mav.setViewName("board/boardList.html");
 		return mav;
 	}
 	
 	//삭제
 	@GetMapping("remove")
-	public ModelAndView mbRemove(@ModelAttribute("fileListVO") FileListVO fileListVO, @RequestParam("bdSeq") String bdSeq, HttpServletRequest request) throws IOException {
+	public ModelAndView mbRemove(@RequestParam("bdSeq") String bdSeq, HttpServletRequest request) throws IOException {
 		ModelAndView mav = new ModelAndView();
 		
 		HttpSession session = request.getSession();
@@ -167,7 +168,7 @@ public class FileListController {
 	}
 	
 	@GetMapping("edit")
-	public ModelAndView edit(@ModelAttribute("fileListVO") FileListVO fileListVO, @RequestParam("bdSeq") String bdSeq, HttpServletRequest request) throws IOException {
+	public ModelAndView edit(FileListVO fileListVO, @RequestParam("bdSeq") String bdSeq, HttpServletRequest request) throws IOException {
 		ModelAndView mav = new ModelAndView();
 		System.out.println("bdSeq===="+bdSeq);
 
@@ -208,7 +209,7 @@ public class FileListController {
 		//저장
 		uploadService.fileProcess(fileListVO, request, httpReq);
 		
-		mav = bdSelectOneCall(fileListVO.getSeq(),request);
+		mav = bdSelectOneCall(fileListVO, fileListVO.getSeq(),request);
 		fileListVO.setContent(""); //초기화
 		fileListVO.setTitle(""); //초기화
 		mav.setViewName("board/boardList.html");
